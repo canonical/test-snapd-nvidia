@@ -1,0 +1,99 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Canonical Ltd.
+name: test-snapd-nvidia
+version: 0.1.0
+summary: test snap using dlopen on /var/lib/snapd/lib/gl{,32}
+description: |
+  This snap package is indented for use inside snapd test suite. The snap
+  contains two applications, called 32 and 64. They each enumerate shared
+  libraries in /var/lib/snapd/lib/gl{,32} and attempt to dlopen and dlclose
+  it correctly.
+
+  On a classic system equipped with an Nvidia GPU, with the kernel module
+  loaded, the two directories are populated with proprietary libraries exposed
+  by the host system.
+base: core24
+grade: stable
+confinement: strict
+platforms:
+  amd64:
+
+apps:
+  32:
+    command: snap/32
+    plugs:
+      - opengl
+  64:
+    command: snap/64
+    plugs:
+      - opengl
+
+parts:
+  wrappers:
+    plugin: dump
+    source: ./wrappers/
+  libs:
+    plugin: nil
+    override-pull: |
+      dpkg --add-architecture i386
+      apt update
+      for pkg in \
+        libbsd0 \
+        libdrm2 \
+        libegl1 \
+        libexpat1 \
+        libffi8 \
+        libgbm1 \
+        libgl1 \
+        libgles1 \
+        libgles2 \
+        libglvnd0 \
+        libglx0 \
+        libmd0 \
+        libopengl0 \
+        libwayland-client0 \
+        libwayland-server0 \
+        libx11-6 \
+        libxau6 \
+        libxcb-randr0 \
+        libxcb1 \
+        libxdmcp6 \
+        libxext6 \
+        ;
+      do
+        apt download "$pkg":i386 "$pkg":amd64
+      done
+    override-build: |
+      # Unpack all the libraries into the root directory of the snap.
+      shopt -s nullglob
+      for deb in "$CRAFT_PART_SRC"/*.deb; do
+          dpkg -x "$deb" "$CRAFT_PART_INSTALL"
+      done
+    prime:
+      - -etc
+      - -usr/share/doc
+      - -usr/share/bug
+      - -usr/share/lintian
+      - -usr/share/glvnd
+  dlopen-tool-32:
+    plugin: make
+    source: ./dlopen-tool
+    build-packages:
+      - gcc-multilib
+    make-parameters:
+      - --warn-undefined-variables
+      - prefix=/
+      - bindir=/bin
+      - EXEEXT=.32
+      - TARGET_ARCH=-m32
+  dlopen-tool-64:
+    plugin: make
+    source: ./dlopen-tool
+    build-packages:
+      - gcc-multilib
+    make-parameters:
+      - --warn-undefined-variables
+      - prefix=/
+      - bindir=/bin
+      - EXEEXT=.64
+      - TARGET_ARCH=-m64

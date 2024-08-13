@@ -1,0 +1,4 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: test-snapd-nvidia
+Upstream-Contact: Zygmunt Krynicki <zygmunt.krynicki@canonical.com>
+Source: https://github.com/zyga/test-snapd-nvidia

@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Canonical Ltd.
+
+dlopen-tool.32
+dlopen-tool.64
+dlopen-tool
+*.o

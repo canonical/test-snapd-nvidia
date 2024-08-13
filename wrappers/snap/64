@@ -1,0 +1,8 @@
+#!/bin/bash
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Canonical Ltd.
+set -xeu
+shopt -s nullglob
+export LD_LIBRARY_PATH="$SNAP/usr/lib/x86_64-linux-gnu:$SNAP_LIBRARY_PATH"
+# Filter-out libnvidia-pkcs11.so as it links to libssl1 which is not present in Ubuntu 24.04.
+exec "$SNAP"/bin/dlopen-tool.64 $(ls /var/lib/snapd/lib/gl/*.so* | grep -v libnvidia-pkcs11.so)

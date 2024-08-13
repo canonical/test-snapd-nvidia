@@ -1,0 +1,7 @@
+#!/bin/bash
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Canonical Ltd.
+set -xeu
+shopt -s nullglob
+export LD_LIBRARY_PATH="$SNAP/usr/lib/i386-linux-gnu:$SNAP_LIBRARY_PATH"
+exec "$SNAP"/bin/dlopen-tool.32 /var/lib/snapd/lib/gl32/*.so*
