@@ -97,3 +97,10 @@ parts:
       - bindir=/bin
       - EXEEXT=.64
       - TARGET_ARCH=-m64
+
+# Ignore libraries as we will need them later on, through dlopen,
+# and nothing is linking to them explicitly.
+lint:
+  ignore:
+    - library:
+        - usr/lib/**
